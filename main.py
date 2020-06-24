@@ -8,7 +8,13 @@ pygame.init()
 width,height = 1080,720
 screen  = pygame.display.set_mode((width,height))
 font = pygame.font.SysFont(None,32)
+
+#images
 menu_bg = pygame.image.load("menubg.png").convert()
+game_backround = pygame.image.load("background.png").convert()
+pipeup = pygame.image.load("pipeup.png")
+pipedown = pygame.image.load("pipedown.png")
+
 
 clock = pygame.time.Clock()
 fps = 60
@@ -19,12 +25,14 @@ pipespeed = 2
 class Pipe:
 	
 	def __init__(self):
-		self.y = random.randint(40,height-40)
+		self.y = random.randint(70,height-70)
 		self.x = width+50
 	def update(self):
 		self.x -= pipespeed
-		pygame.draw.rect(screen,(0,255,0),pygame.Rect(self.x-25, 0,          50, self.y-100))
-		pygame.draw.rect(screen,(0,255,0),pygame.Rect(self.x-25, self.y+100, 50, height)) 
+		pygame.draw.rect(screen,(0,255,0),pygame.Rect(self.x-75, 0,          150, self.y-100))
+		pygame.draw.rect(screen,(0,255,0),pygame.Rect(self.x-75, self.y+100, 150, height)) 
+		screen.blit(pipeup,(self.x-75,self.y+100))
+		screen.blit(pipedown,(self.x-75,self.y-820))
 
 
 class Bird:
@@ -121,8 +129,7 @@ def game():
 	alive = True
 	death = False
 	while alive:
-		screen.fill((240,240,240))
-
+		screen.blit(game_backround,(0,0))
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				pygame.quit()
@@ -136,6 +143,9 @@ def game():
 				pipes.append(Pipe())
 			for pipe in pipes:
 				pipe.update()
+				if pipe.x < -200:
+					pipes = pipes[1:]
+
 			#hitbox of the bird marked with red box
 			block((b1.xpos,b1.ypos))
 			b1.update()
@@ -155,7 +165,6 @@ def game():
 		pygame.display.update()
 		clock.tick(fps)
 		timer1 += 1
-
 main_menu()
 print("Game Quit")
 pygame.quit()
