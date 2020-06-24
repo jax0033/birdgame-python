@@ -18,17 +18,17 @@ pipedown = pygame.image.load("pipedown.png")
 
 clock = pygame.time.Clock()
 fps = 60
-
-global pipespeed
+global score
+score = 0
 pipespeed = 2
-
 class Pipe:
 	
 	def __init__(self):
 		self.y = random.randint(70,height-70)
 		self.x = width+50
+		self.passed = False
 	def update(self):
-		self.x -= pipespeed
+		self.x -= pipespeed*(score/10+1)
 		pygame.draw.rect(screen,(0,255,0),pygame.Rect(self.x-75, 0,          150, self.y-100))
 		pygame.draw.rect(screen,(0,255,0),pygame.Rect(self.x-75, self.y+100, 150, height)) 
 		screen.blit(pipeup,(self.x-75,self.y+100))
@@ -123,11 +123,13 @@ def main_menu():
 		clock.tick(fps)
 
 def game():
+	global score
 	timer1 = 0
 	pipes = []
 	b1 = Bird(height/2)
 	alive = True
 	death = False
+	score = 0
 	while alive:
 		screen.blit(game_backround,(0,0))
 		for event in pygame.event.get():
@@ -139,9 +141,16 @@ def game():
 				b1.tapped()
 
 		if alive == True:
-			if timer1%260 == 0:
+			if score%10 == 0:
+
+				difficulty = round(score/10)+1
+			if timer1%round((260/difficulty)) == 0:
 				pipes.append(Pipe())
 			for pipe in pipes:
+				if b1.xpos > pipe.x+75 and pipe.passed == False:
+					score += 1
+					pipe.passed = True
+					print(f"score increased :  {score}")
 				pipe.update()
 				if pipe.x < -200:
 					pipes = pipes[1:]
