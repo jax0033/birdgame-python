@@ -13,11 +13,18 @@ menu_bg = pygame.image.load("menubg.png").convert()
 clock = pygame.time.Clock()
 fps = 60
 
+global pipespeed
+pipespeed = 2
 
 class Pipe:
 	
 	def __init__(self):
-		self.ypos = random.randint(40,height-40)
+		self.y = random.randint(40,height-40)
+		self.x = width+50
+	def update(self):
+		self.x -= pipespeed
+		pygame.draw.rect(screen,(0,255,0),pygame.Rect(self.x-25, 0,          50, self.y-100))
+		pygame.draw.rect(screen,(0,255,0),pygame.Rect(self.x-25, self.y+100, 50, height)) 
 
 
 class Bird:
@@ -62,19 +69,35 @@ def main_menu():
 		button_2 = pygame.Rect(0,200,width,50)
 		pygame.draw.rect(screen,(66,66,66),button_1)
 		pygame.draw.rect(screen,(66,66,66),button_2)
+
 		
-		draw_text("Start",font,(255,255,255), screen, width/2, 125)
-		draw_text("Exit",font,(255,255,255), screen, width/2, 225)
 		mx,my = pygame.mouse.get_pos()
 		
 		if button_1.collidepoint((mx,my)):
+			pygame.draw.rect(screen,(34,34,34),button_1)
+			pygame.draw.rect(screen,(66,66,66),button_2)
+
+			draw_text("Start",font,(60,4,117), screen, width/2, 125)
+			draw_text("Exit",font,(255,255,255), screen, width/2, 225)
 			if click:
 				game()
-		if button_2.collidepoint((mx,my)):
+		elif button_2.collidepoint((mx,my)):
+			pygame.draw.rect(screen,(66,66,66),button_1)
+			pygame.draw.rect(screen,(34,34,34),button_2)
+
+			draw_text("Start",font,(255,255,255), screen, width/2, 125)
+			draw_text("Exit",font,(60,4,117), screen, width/2, 225)
 			if click:
 				pygame.quit()
 				sys.exit()
-		
+		else:
+			pygame.draw.rect(screen,(66,66,66),button_1)
+			pygame.draw.rect(screen,(66,66,66),button_2)
+
+			draw_text("Start",font,(255,255,255), screen, width/2, 125)
+			draw_text("Exit",font,(255,255,255), screen, width/2, 225)
+
+
 		click = False
 		
 		for event in pygame.event.get():
@@ -92,11 +115,12 @@ def main_menu():
 		clock.tick(fps)
 
 def game():
+	timer1 = 0
+	pipes = []
 	b1 = Bird(height/2)
 	alive = True
 	death = False
 	while alive:
-
 		screen.fill((240,240,240))
 
 		for event in pygame.event.get():
@@ -108,6 +132,11 @@ def game():
 				b1.tapped()
 
 		if alive == True:
+			if timer1%260 == 0:
+				pipes.append(Pipe())
+			for pipe in pipes:
+				pipe.update()
+			#hitbox of the bird marked with red box
 			block((b1.xpos,b1.ypos))
 			b1.update()
 
@@ -125,6 +154,7 @@ def game():
 
 		pygame.display.update()
 		clock.tick(fps)
+		timer1 += 1
 
 main_menu()
 print("Game Quit")
