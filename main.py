@@ -14,6 +14,7 @@ menu_bg = pygame.image.load("menubg.png").convert()
 game_backround = pygame.image.load("background.png").convert()
 pipeup = pygame.image.load("pipeup.png")
 pipedown = pygame.image.load("pipedown.png")
+ground = pygame.image.load("ground.png")
 
 clock = pygame.time.Clock()
 fps = 60
@@ -22,10 +23,19 @@ score = 0
 pipespeed = 6
 
 
+class Ground:
+
+	def __init__(self):
+		self.top = 27
+		self.bot = height-27
+		self.hitbox = [pygame.Rect(0,0,width,self.top),pygame.Rect(0,self.bot,width,self.top)]
+		screen.blit(ground,(0,0))
+
+
 class Pipe:
 	
 	def __init__(self):
-		self.y = random.randint(70,height-70)
+		self.y = random.randint(100,height-100)
 		self.x = width+50
 		self.passed = False
 		self.hitbox = [pygame.Rect(self.x-75, 0,          150, self.y-100),pygame.Rect(self.x-75, self.y+100, 150, height)] 
@@ -34,6 +44,7 @@ class Pipe:
 		screen.blit(pipeup,(self.x-75,self.y+100))
 		screen.blit(pipedown,(self.x-75,self.y-820))
 		self.hitbox = [pygame.Rect(self.x-75, 0,          150, self.y-100),pygame.Rect(self.x-75, self.y+100, 150, height)] 
+
 
 class Bird:
 
@@ -49,7 +60,7 @@ class Bird:
 	def update(self):
 		self.timer += 1/60
 		if self.ascendspeed > 0:
-			self.ascendspeed -= self.yspeed*self.timer**2.5
+			self.ascendspeed -= self.yspeed*self.timer**2.6
 			if self.ascendspeed < 0:
 				self.ascendspeed = 0
 		self.ypos += self.yspeed*self.timer**2 - self.ascendspeed
@@ -141,9 +152,9 @@ def game():
 	death = False
 	score = 0
 	kill = False
-	
 	while alive:
 		screen.blit(game_backround,(0,0))
+		Ground()
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				pygame.quit()
@@ -180,11 +191,15 @@ def game():
 			pygame.draw.polygon(screen,(255,255,25),b1.corners)
 			if kill == True:
 				main_menu()
+
+			#hit registration
 			for point in b1.corners:
 				for box in nextpipe.hitbox:
 					if checkcol(box,point[0],point[1]):
 						kill = True
-						
+				for pos in Ground().hitbox:
+					if checkcol(pos,point[0],point[1]):
+						kill = True
 			if b1.ypos+b1.yspeed*b1.timer**2.5 > height:
 				b1.ypos = height-25
 				alive = False
