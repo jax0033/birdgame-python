@@ -1,3 +1,3 @@
-Create asset folder with all the assets, add sounds, finally add a collision registration for the pipes, add the flappy bird.
+Create asset folder with all the assets, add sounds, add the flappy bird.
 
 and always improve bad code.
