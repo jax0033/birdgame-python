@@ -38,7 +38,7 @@ class Ground:
 		screen.blit(ground,(0,0))
 
 
-#pie
+#pipe
 class Pipe:
 	
 	def __init__(self):
