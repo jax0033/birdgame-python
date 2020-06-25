@@ -15,25 +15,25 @@ game_backround = pygame.image.load("background.png").convert()
 pipeup = pygame.image.load("pipeup.png")
 pipedown = pygame.image.load("pipedown.png")
 
-
 clock = pygame.time.Clock()
 fps = 60
 global score
 score = 0
-pipespeed = 2
+pipespeed = 6
+
+
 class Pipe:
 	
 	def __init__(self):
 		self.y = random.randint(70,height-70)
 		self.x = width+50
 		self.passed = False
+		self.hitbox = [pygame.Rect(self.x-75, 0,          150, self.y-100),pygame.Rect(self.x-75, self.y+100, 150, height)] 
 	def update(self):
-		self.x -= pipespeed*(score/10+1)
-		pygame.draw.rect(screen,(0,255,0),pygame.Rect(self.x-75, 0,          150, self.y-100))
-		pygame.draw.rect(screen,(0,255,0),pygame.Rect(self.x-75, self.y+100, 150, height)) 
+		self.x -= pipespeed*(score/10+1) 
 		screen.blit(pipeup,(self.x-75,self.y+100))
 		screen.blit(pipedown,(self.x-75,self.y-820))
-
+		self.hitbox = [pygame.Rect(self.x-75, 0,          150, self.y-100),pygame.Rect(self.x-75, self.y+100, 150, height)] 
 
 class Bird:
 
@@ -42,7 +42,9 @@ class Bird:
 		self.ascendspeed = 0
 		self.yspeed = 30
 		self.xpos = width/2.75
-		self.timer = 0	
+		self.timer = 0
+		self.scale = 20
+		self.corners = [(self.xpos-self.scale,self.ypos-self.scale),(self.xpos-self.scale,self.ypos+self.scale),(self.xpos+self.scale,self.ypos+self.scale),(self.xpos+self.scale,self.ypos-self.scale)]
 
 	def update(self):
 		self.timer += 1/60
@@ -51,12 +53,20 @@ class Bird:
 			if self.ascendspeed < 0:
 				self.ascendspeed = 0
 		self.ypos += self.yspeed*self.timer**2 - self.ascendspeed
+		self.yvel = self.yspeed*self.timer**2 - self.ascendspeed
+		self.corners = [(self.xpos-self.scale,self.ypos-self.scale),(self.xpos-self.scale,self.ypos+self.scale),(self.xpos+self.scale,self.ypos+self.scale),(self.xpos+self.scale,self.ypos-self.scale)]
 
 	def tapped(self):
 		self.ascendspeed = 9
 		self.yspeed = 30
 		self.timer = 0
 
+
+def checkcol(rect,x,y):
+	if rect.collidepoint((x,y)):
+		return True
+	else:
+		return False
 
 def block(coords, color=(255,0,0)):
 	x,y = coords[0],coords[1]
@@ -130,6 +140,8 @@ def game():
 	alive = True
 	death = False
 	score = 0
+	kill = False
+	
 	while alive:
 		screen.blit(game_backround,(0,0))
 		for event in pygame.event.get():
@@ -144,29 +156,47 @@ def game():
 			if score%10 == 0:
 
 				difficulty = round(score/10)+1
-			if timer1%round((260/difficulty)) == 0:
+			
+			if timer1%round((100/difficulty)) == 0:
 				pipes.append(Pipe())
+			
+			b1.update()
 			for pipe in pipes:
 				if b1.xpos > pipe.x+75 and pipe.passed == False:
 					score += 1
 					pipe.passed = True
 					print(f"score increased :  {score}")
+			
 				pipe.update()
+			
 				if pipe.x < -200:
 					pipes = pipes[1:]
+			
+				if pipe.x+95 > b1.xpos:
+					nextpipe = pipe
+					break
 
-			#hitbox of the bird marked with red box
-			block((b1.xpos,b1.ypos))
-			b1.update()
-
+			
+			pygame.draw.polygon(screen,(255,255,25),b1.corners)
+			if kill == True:
+				main_menu()
+			for point in b1.corners:
+				for box in nextpipe.hitbox:
+					if checkcol(box,point[0],point[1]):
+						kill = True
+						
 			if b1.ypos+b1.yspeed*b1.timer**2.5 > height:
 				b1.ypos = height-25
 				alive = False
 				death = True
+			
 			elif b1.ypos < 0:
 				b1.ypos = -5
 				alive = False
 				death = True
+
+			for point in b1.corners:
+				pygame.draw.circle(screen, (0,0,255), (round(point[0]), round(point[1])), 1)
 
 		elif death == True:
 			block((b1.xpos,b1.ypos))
