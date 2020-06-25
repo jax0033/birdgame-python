@@ -194,7 +194,7 @@ def game():
 				score1 = 14
 
 			#creates new Pipe object every x game frames
-			if timer1%round((120/score1+1)) == 0:
+			if timer1%round((120/(score1+1))) == 0:
 				pipes.append(Pipe())
 			
 			#updates the bird and checks if a the bird passed a pipe
