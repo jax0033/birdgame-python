@@ -1,3 +1,3 @@
-add sounds
+add sounds, improve textures, add animation for bird, maybe rotation aswell
 
 and always improve bad code.
