@@ -9,7 +9,7 @@ import os
 pygame.init()
 width,height = 1080,720
 screen  = pygame.display.set_mode((width,height))
-font = pygame.font.SysFont(None,32)
+font = pygame.font.SysFont(None,60)
 
 #images
 menu_bg = pygame.image.load("./assets/pictures/menubg.png").convert()
@@ -31,7 +31,7 @@ score = 0
 score1 = 0
 
 #the speed the pipes travel to the left
-pipespeed = 6
+pipespeed = 16
 def run(config_path):
 	config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
 
@@ -109,8 +109,7 @@ def checkcol(rect,x,y):
 #draws text onto the screen
 def draw_text(text,font,color,surface,x,y):
 	textobj = font.render(text,1,color)
-	textrect = textobj.get_rect(center=(x,y))
-	surface.blit(textobj, textrect)
+	surface.blit(textobj,(x,y))
 
 #the main game
 def game(genomes, config):
@@ -138,7 +137,6 @@ def game(genomes, config):
 	timer1 = 0
 
 	while alive:
-		clock.tick(fps)
 		#projects game background and spikes to screen
 		screen.blit(game_backround,(0,0))
 		Ground()
@@ -160,14 +158,11 @@ def game(genomes, config):
 
 			
 			#creates new Pipe object every x game frames
-			if timer1%120 == 0:
+			if timer1%60 == 0:
 				pipes.append(Pipe())
 			
 			
 			#updates the bird and checks if a the bird passed a pipe
-			for bird in birds:
-				bird.update()
-
 			for pipe in pipes:
 				for bird in birds:
 					add_score = False
@@ -181,7 +176,7 @@ def game(genomes, config):
 						for g in ge:
 							g.fitness += 5
 
-						print(f"score increased :  {score}")
+						print(f"score increased : {score}")
 					if add_score:
 						score += 1
 			
@@ -189,13 +184,16 @@ def game(genomes, config):
 				#updates / deletes pipe if necessary
 				pipe.update()
 				
-			
+				k = False
 				if pipe.x < -200:
 					pipes = pipes[1:]
 				for bird in birds:
 					if pipe.x+95 > bird.xpos:
 						nextpipe = pipe
+						k = True
 						break
+				if k:
+					break
 			if len(birds) < 1:
 				alive = False
 				break
@@ -249,8 +247,11 @@ def game(genomes, config):
 					nets.pop(n)
 					ge.pop(n)
 			
+		draw_text(f"Birds Alive : {len(birds)}", font, (0,0,0) ,screen, 20,13)
+		draw_text(f"Score : {score}", font, (0,0,0) ,screen, 20,48)
 		#updates the game frame
 		pygame.display.update()
+		clock.tick(fps)
 		timer1 += 1
 
 #opens the main menu on start
