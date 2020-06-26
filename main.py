@@ -10,12 +10,12 @@ screen  = pygame.display.set_mode((width,height))
 font = pygame.font.SysFont(None,32)
 
 #images
-menu_bg = pygame.image.load("menubg.png").convert()
-game_backround = pygame.image.load("background.png").convert()
-pipeup = pygame.image.load("pipeup.png")
-pipedown = pygame.image.load("pipedown.png")
-ground = pygame.image.load("ground.png")
-bird = pygame.image.load("bird.png")
+menu_bg = pygame.image.load("./assets/pictures/menubg.png").convert()
+game_backround = pygame.image.load("./assets/pictures/background.png").convert()
+pipeup = pygame.image.load("./assets/pictures/pipeup.png")
+pipedown = pygame.image.load("./assets/pictures/pipedown.png")
+ground = pygame.image.load("./assets/pictures/ground.png")
+bird = pygame.image.load("./assets/pictures/bird.png")
 
 
 #ingame clock
@@ -30,7 +30,6 @@ score1 = 0
 
 #the speed the pipes travel to the left
 pipespeed = 6
-
 
 #top and bottom spikes
 class Ground:
